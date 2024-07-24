@@ -3,9 +3,11 @@ import{
     createUserWithEmailAndPassword ,
     doc ,
     setDoc ,
+    storage ,
     ref ,
     uploadBytes ,
-    getDownloadURL ,
+    getDownloadURL, 
+    
 } from "../utils/utils.js";
 
 
@@ -41,10 +43,28 @@ signup_btn.addEventListener("submit", function (e) {
 
     };
 
+    // create account
     createUserWithEmailAndPassword(auth,email,password)
     .then((user) => {
         console.log("user=>", user.user.uid)
+        // upload user Img
+        const userRef = ref(storage , `user/${user.user.uid}`);
+        uploadBytes(userRef , img)
+        .then(() =>{
+            console.log("User Image Uploaded")  ;
+            // getting url of the image we just uploaded.
+            getDownloadURL(userRef)
+            .then((url) =>{
+                console.log("url agya hai=>", url)
+            })
+            .catch((err) => console.log("url firbase ni derha"));
+            
+
+            
+        }).catch(() => {
+            console.log("error in uploading user image")
+        });
     })
     .catch((err) => alert(err))
     console.log(userInfo)
-})
+});
